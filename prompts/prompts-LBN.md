@@ -80,3 +80,72 @@ He actualizado el esquema de la base de datos integrando los modelos propuestos 
 Si necesitas realizar cambios adicionales al esquema, puedes repetir los pasos 2-4 para crear nuevas migraciones.
 
 El archivo migration.sql contiene todo el código SQL necesario para crear las tablas, índices y relaciones en la base de datos PostgreSQL, asegurando un rendimiento óptimo para las consultas más comunes en este tipo de sistema. 
+
+## Prompt 3
+**Fecha:** 11-06-2024
+**Modelo:** Claude 3.7 Sonnet
+
+**Usuario:**
+¿Está normalizada esta estructura de base de datos? 
+¿Se puede mejorar algo?
+Sigue las intrucciones definidas en @prompts-intrucciones.md 
+
+**Asistente:**
+Sí, la estructura de base de datos mostrada en el esquema Prisma está bastante bien normalizada, siguiendo los principios de normalización hasta la Tercera Forma Normal (3NF). Observo las siguientes características positivas:
+
+1. Cada tabla tiene una clave primaria clara (id)
+2. Las relaciones están bien definidas con claves foráneas
+3. Los atributos son atómicos (no divisibles)
+4. Se han implementado índices apropiados en claves primarias, foráneas y campos de búsqueda frecuente
+
+Sin embargo, hay algunas mejoras potenciales:
+
+1. **Normalización de campos descriptivos**: El modelo `Position` contiene muchos campos de texto descriptivos (`description`, `jobDescription`, `requirements`, `responsibilities`, `benefits`, `companyDescription`) que podrían normalizarse en tablas separadas si estos contenidos se comparten entre diferentes posiciones.
+
+2. **Tabla de habilidades**: No existe una entidad para representar habilidades (skills) de los candidatos ni requisitos técnicos para las posiciones, lo que sería muy útil en un sistema de reclutamiento.
+
+3. **Manejo de documentos**: Podría añadirse una estructura más robusta para documentos adjuntos a entrevistas, no solo para currículums.
+
+4. **Historial de cambios de estado**: Para aplicaciones y entrevistas, podría ser útil tener tablas de historial que registren los cambios de estado con fechas.
+
+5. **Modelo de notificaciones**: Implementar una estructura para manejar notificaciones a candidatos y empleados.
+
+6. **Campos de auditoría**: Agregar campos como `createdAt`, `updatedAt`, `createdBy` y `updatedBy` a las tablas principales para facilitar la trazabilidad.
+
+En general, el esquema está bien diseñado y las mejoras sugeridas dependerán de los requisitos específicos del negocio y del volumen de datos esperado. 
+
+## Prompt 4
+**Fecha:** 11-06-2024
+**Modelo:** Claude 3.7 Sonnet
+
+**Usuario:**
+Aplica las mejoras 2, 3, 4, 5 y 6
+Sigue las instrucciones definidas en @prompts-intrucciones.md 
+
+**Asistente:**
+He implementado las mejoras solicitadas al esquema de base de datos:
+
+1. **Tabla de habilidades (skills)**: 
+   - Añadido el modelo `Skill` como entidad principal
+   - Creadas tablas de relación para `CandidateSkill`, `PositionSkill` y `EmployeeSkill`
+   - Incluidos campos para nivel de habilidad, años de experiencia e importancia en la posición
+
+2. **Estructura más robusta para documentos**:
+   - Añadido el modelo `Document` para gestionar todo tipo de documentos
+   - Creado el modelo `DocumentAccess` para registrar quién accede a qué documentos
+   - Mejorada la gestión de metadatos para los documentos
+
+3. **Historial de cambios de estado**:
+   - Creados modelos de historial para `ApplicationStateHistory`, `InterviewStateHistory` y `PositionStateHistory`
+   - Cada cambio de estado registra el estado anterior, nuevo estado, fecha y razón del cambio
+
+4. **Modelo de notificaciones**:
+   - Implementado el modelo `Notification` para gestionar notificaciones a candidatos y empleados
+   - Soporte para diferentes tipos de notificaciones (email, SMS, app)
+   - Seguimiento del estado de la notificación y cuándo fue leída
+
+5. **Campos de auditoría**:
+   - Añadidos campos `createdAt`, `updatedAt`, `createdBy` y `updatedBy` a todos los modelos
+   - Creado un modelo base (`BaseModel`) que podría utilizarse para futuras implementaciones
+
+Cada nuevo modelo incluye los índices apropiados para optimizar las consultas más frecuentes. 
